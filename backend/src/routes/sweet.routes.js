@@ -7,6 +7,8 @@ const sweetController = require('../controllers/sweet.controller');
 // Protected routes
 router.post('/', auth, sweetController.create);
 router.get('/', auth, sweetController.getAll);
+router.get('/search', auth, sweetController.search);
+
 router.put('/:id', auth, sweetController.update);
 router.delete('/:id', auth, sweetController.remove);
 

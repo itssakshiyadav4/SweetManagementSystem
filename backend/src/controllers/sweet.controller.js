@@ -45,3 +45,21 @@ exports.restock = async (req, res) => {
   await sweet.save();
   res.json(sweet);
 };
+
+exports.search = async (req, res) => {
+  const { name, category, minPrice, maxPrice } = req.query;
+
+  const filter = {};
+
+  if (name) filter.name = new RegExp(name, 'i');
+  if (category) filter.category = category;
+  if (minPrice || maxPrice) {
+    filter.price = {};
+    if (minPrice) filter.price.$gte = Number(minPrice);
+    if (maxPrice) filter.price.$lte = Number(maxPrice);
+  }
+
+  const sweets = await Sweet.find(filter);
+  res.json(sweets);
+};
+
