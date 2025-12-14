@@ -6,11 +6,17 @@ exports.create = async (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
-  res.json(await Sweet.find());
+  const sweets = await Sweet.find();
+  res.json(sweets);
 };
 
 exports.update = async (req, res) => {
-  res.json(await Sweet.findByIdAndUpdate(req.params.id, req.body, { new: true }));
+  const sweet = await Sweet.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.json(sweet);
 };
 
 exports.remove = async (req, res) => {
@@ -20,7 +26,11 @@ exports.remove = async (req, res) => {
 
 exports.purchase = async (req, res) => {
   const sweet = await Sweet.findById(req.params.id);
-  if (sweet.quantity <= 0) return res.status(400).json({ msg: 'Out of stock' });
+  if (!sweet) return res.status(404).json({ msg: 'Sweet not found' });
+
+  if (sweet.quantity <= 0) {
+    return res.status(400).json({ msg: 'Out of stock' });
+  }
 
   sweet.quantity -= 1;
   await sweet.save();
@@ -29,7 +39,9 @@ exports.purchase = async (req, res) => {
 
 exports.restock = async (req, res) => {
   const sweet = await Sweet.findById(req.params.id);
-  sweet.quantity += req.body.amount;
+  if (!sweet) return res.status(404).json({ msg: 'Sweet not found' });
+
+  sweet.quantity += req.body.amount || 1;
   await sweet.save();
   res.json(sweet);
 };
